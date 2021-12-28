@@ -89,7 +89,7 @@ class UserCtrl {
             })
          }
 
-         return res.json({
+         return res.status(401).json({
             data: null
          })
 

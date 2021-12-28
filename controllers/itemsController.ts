@@ -1,5 +1,5 @@
 import express from 'express';
-import { Item, ItemInfo } from '../models';
+import { Brand, Item, ItemInfo, Type } from '../models';
 
 interface IQuery {
    typeId?: string,
@@ -50,6 +50,36 @@ class ItemsCtrl {
       }
    }
 
+   update = async (req: express.Request, res: express.Response) => {
+      try {
+         const body = req.body;
+         const { id } = req.params;
+
+         if (!id || !body) return res.status(400).send();
+
+         const item = await Item.update(body, { where: { id } })
+
+         if (!item) return res.status(400).send();
+
+         if (body.info) {
+            (body.info as IInfoBody[]).forEach(async ({ title, description }) => (
+               await ItemInfo.create({ itemId: id, title, description }))
+            )
+         }
+         const result = await Item.findOne({ where: { id }, include: { model: ItemInfo } });
+
+         return res.json({
+            data: result
+         })
+
+      } catch (err) {
+         return res.status(500).json({
+            data: null,
+            error: err
+         })
+      }
+   }
+
    getAll = async (req: express.Request, res: express.Response) => {
       try {
          let { typeId, brandId, limit, page } = req.query as IQuery;
@@ -90,15 +120,39 @@ class ItemsCtrl {
       }
    }
 
+   getTrands = async (req: express.Request, res: express.Response) => {
+      try {
+         const limit = 6;
+
+         const items = await Item.findAll({
+            order: [
+               ['rating', "DESC"]
+            ],
+            limit
+         });
+
+         if (!items) return res.status(404).send();
+
+         return res.json({
+            data: items
+         })
+
+      } catch (err) {
+         return res.status(500).json({
+            data: null,
+            error: err
+         })
+      }
+   }
+
    getOne = async (req: express.Request, res: express.Response) => {
       try {
          const id = req.params.id;
 
          const item = await Item.findOne({
             where: { id },
-            include: {
-               model: ItemInfo,
-            }
+            include: [{ model: ItemInfo }, { model: Brand }, { model: Type }],
+
          });
 
          if (!item) return res.status(500).send();

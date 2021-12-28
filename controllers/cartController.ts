@@ -1,5 +1,5 @@
 import express from 'express';
-import { Cart, CartItem } from '../models';
+import { Cart, CartItem, Item } from '../models';
 import { IUser } from '../types/IUser';
 
 class CartCtrl {
@@ -42,13 +42,19 @@ class CartCtrl {
 
          const cart = await Cart.findOne({
             where: { userId: id },
-            include: {
-               model: CartItem,
-            }
          });
 
+         if (!cart) return res.status(401).send();
+
+         const cartItems = await CartItem.findAll({
+            where: { cartId: cart.id },
+            include: {
+               model: Item
+            }
+         })
+
          return res.json({
-            data: cart
+            data: cartItems
          })
 
       } catch (err) {
