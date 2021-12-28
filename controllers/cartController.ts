@@ -14,13 +14,19 @@ class CartCtrl {
 
          if (!cart) return res.status(404).send();
 
-         const isContains = await CartItem.findOne({ where: { cartId: cart.id } })
+         const isContains = await CartItem.findOne({ where: { cartId: cart.id, itemId: id } })
 
          if (isContains) {
             return res.status(400).send();
          }
 
-         const item = await CartItem.create({ itemId: id, cartId: cart.id })
+         const item = await CartItem.create({ itemId: id, cartId: cart.id }, {
+            include: {
+               model: Item
+            }
+         })
+
+         await item.reload()
 
          return res.json({
             data: item

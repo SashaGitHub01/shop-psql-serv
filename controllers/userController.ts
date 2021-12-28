@@ -80,7 +80,10 @@ class UserCtrl {
             const decoded = jwt.decode(token)
             const id = (decoded as IJwt).id;
 
-            const user = await User.findOne({ where: { id }, attributes: { exclude: ['password'] } });
+            const user = await User.findOne({
+               where: { id },
+               attributes: { exclude: ['password'] }
+            });
 
             if (!user) return res.status(404).send();
 
