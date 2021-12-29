@@ -102,6 +102,21 @@ class UserCtrl {
          })
       }
    }
+
+   logout = async (req: express.Request, res: express.Response) => {
+      try {
+         if (req.session) {
+            req.session.token = null;
+         }
+
+         return res.status(200).send()
+
+      } catch (err) {
+         return res.status(500).json({
+            data: null,
+         })
+      }
+   }
 }
 
 export const userController = new UserCtrl();
