@@ -5,6 +5,7 @@ export const itemsRouter = Router();
 
 itemsRouter.get('/', itemsController.getAll)
 itemsRouter.get('/trands', itemsController.getTrands)
+itemsRouter.get('/history', itemsController.getHistory)
 itemsRouter.get('/:id', itemsController.getOne)
 itemsRouter.post('/', itemsController.create)
 itemsRouter.put('/:id', itemsController.update)

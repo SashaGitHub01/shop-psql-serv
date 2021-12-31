@@ -168,6 +168,37 @@ class ItemsCtrl {
          })
       }
    }
+
+   getHistory = async (req: express.Request, res: express.Response) => {
+      try {
+         const limit = 20;
+         let page = req.query.page as unknown as number;
+
+         if (!page) page = 1;
+
+         const offset = (page * limit) - limit;
+
+
+         const items = await Item.findAll({
+            order: [
+               ['createdAt', "DESC"]
+            ],
+            limit,
+            offset
+         });
+
+
+         return res.json({
+            data: items
+         })
+
+      } catch (err) {
+         return res.status(500).json({
+            data: null,
+            error: err
+         })
+      }
+   }
 }
 
 export const itemsController = new ItemsCtrl();
